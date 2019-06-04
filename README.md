@@ -1,2 +1,2 @@
 # spacepong
-Game inspired by Pong and Space Invaders.
+A game inspired by Pong and Space Invaders.

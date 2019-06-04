@@ -1,0 +1,16 @@
+@font-face {
+    font-family: PressStart2P;
+    src: url('PressStart2P.ttf');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+/*
+html, body, canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+*/
