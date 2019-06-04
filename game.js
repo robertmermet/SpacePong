@@ -20,7 +20,7 @@ window.addEventListener('load', function load() {
     };
 
     var score = {
-        current       : 10000000000,
+        current       : 0,
         highscore     : getHighscore(),
         pointTimer    : 0,
         pointVal      : 0,
