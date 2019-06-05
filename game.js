@@ -12,7 +12,7 @@ window.addEventListener('load', function load() {
 
     const audio = {
         ballHit   : 'wav/4359__noisecollector__pongblipf4.wav',
-        shoot    : 'wav/344310__musiclegends__laser-shoot.wav',
+        shoot     : 'wav/344310__musiclegends__laser-shoot.wav',
         hit       : 'wav/462189__tolerabledruid6__8-bit-atari-boom.wav',
         explosion : 'wav/425335__soundholder__8bit-explosion-4.wav',
         point     : 'wav/275896__n-audioman__coin02.wav',
@@ -38,11 +38,10 @@ window.addEventListener('load', function load() {
         hasFired   : false
     };
 
+    var table = new Table();
+
     var canvas = document.createElement('canvas'),
         ctx = canvas.getContext('2d');
-
-    canvas.width = 1230;
-    canvas.height = 920;
 
     document.body.appendChild(canvas);
     window.addEventListener('resize', resize);
@@ -76,73 +75,123 @@ window.addEventListener('load', function load() {
     };
 
     var render = function() {
-        ctx.fillStyle = palatte.table;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // Draw divider
-        ctx.fillStyle = palatte.divider;
-        for (var i = 0; i < 31; i++) {
-            ctx.fillRect(canvas.width / 2 - 2, i * 30, 8, 16);
-        }
-        // Draw score
-        ctx.font = '20px PressStart2P';
-        ctx.textAlign = 'left';
-        ctx.fillText('SCORE', 20, 30);
-        ctx.textAlign = 'right';
-        ctx.fillText(score.current, 120, 60);
-        ctx.textAlign = 'left';
-        // Draw recent point
-        if (score.pointTimer) {
-            ctx.fillText(score.pointVal, 140, 60);
-        }
-        // Draw gameover animation
-        if (score.gameoverTimer) {
-            if (score.gameoverTimer > 45) {
-                ctx.fillText('G', 518, 200);
-            } else if (score.gameoverTimer > 41) {
-                ctx.fillText('GA', 518, 200);
-            } else if (score.gameoverTimer > 37) {
-                ctx.fillText('GAM', 518, 200);
-            } else if (score.gameoverTimer > 33) {
-                ctx.fillText('GAME', 518, 200);
-            } else if (score.gameoverTimer > 29) {
-                ctx.fillText('GAME  O', 518, 200);
-            } else if (score.gameoverTimer > 25) {
-                ctx.fillText('GAME  OV', 518, 200);
-            } else if (score.gameoverTimer > 21) {
-                ctx.fillText('GAME  OVE', 518, 200);
-            } else {
-                ctx.fillText('GAME  OVER', 518, 200);
-            }
-        }
-        // Draw prompts
-        if (!flag.hasBoosted) {
-            ctx.fillText('PRESS SHIFT TO BOOST', 20, canvas.height - 10);
-        }
-        ctx.textAlign = 'right';
-        if (!flag.hasFired) {
-            ctx.fillText('PRESS SPACEBAR TO FIRE', canvas.width - 20, canvas.height - 10);
-        }
-        // Draw highscore
-        ctx.fillText('HI-SCORE', canvas.width - 20, 30);
-        ctx.fillText(score.highscore, canvas.width - 20, 60);
-        // Draw player
+        table.render();
+        table.renderTxt();
         player.render();
-        // Draw computer
         computer.render();
-        // Draw ball
         ball.render();
-        // Draw bullets
         gameObjs.cBullets.forEach(function(bullet) {
-            bullet.draw();
+            bullet.render();
         });
         gameObjs.pBullets.forEach(function(bullet) {
-            bullet.draw();
+            bullet.render();
         });
     };
 
     function resize() {
-        // TODO
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if (canvas.width * .75 < canvas.height) {
+            table.pixelSize  = canvas.width / table.width;
+            table.offsetLeft = 0;
+            table.offsetTop  = (canvas.height - (table.height * table.pixelSize)) / 2;
+        } else {
+            table.pixelSize  = canvas.height / table.height;
+            table.offsetLeft = (canvas.width - (table.width * table.pixelSize)) / 2;
+            table.offsetTop  = 0;
+        }
     }
+
+    function Table() {
+        this.width      = 1240;
+        this.height     = 930;
+        this.offsetLeft = 0;
+        this.offsetTop  = 0;
+        this.pixelSize  = 1;
+    }
+
+    Table.prototype.render = function() {
+        // Fill background
+        ctx.fillStyle = palatte.background;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Draw table
+        ctx.fillStyle = palatte.table;
+        ctx.fillRect(table.offsetLeft,
+                     table.offsetTop,
+                     table.width * table.pixelSize,
+                     table.height * table.pixelSize);
+        // Draw divider
+        ctx.fillStyle = palatte.divider;
+        for (var i = 0; i < 31; i++) {
+            ctx.fillRect(canvas.width / 2 - 2,
+                         i * 30 * table.pixelSize + table.offsetTop,
+                         8 * table.pixelSize,
+                         16 * table.pixelSize);
+        }
+    };
+
+    Table.prototype.renderTxt = function() {
+        // Draw score
+        ctx.font = 20 * table.pixelSize + 'px PressStart2P';
+        ctx.textAlign = 'left';
+        ctx.fillText('SCORE',
+                     20 * table.pixelSize + table.offsetLeft,
+                     30 * table.pixelSize + table.offsetTop);
+        ctx.textAlign = 'right';
+        ctx.fillText(score.current,
+                     120 * table.pixelSize + table.offsetLeft,
+                     60 * table.pixelSize + table.offsetTop);
+        ctx.textAlign = 'left';
+        // Draw recent pointraw prompts
+        if (score.pointTimer) {
+            ctx.fillText(score.pointVal,
+                         140 * table.pixelSize + table.offsetLeft,
+                         60 * table.pixelSize + table.offsetTop);
+        }
+        // Draw gameover animation
+        if (score.gameoverTimer) {
+            var gameoverTxt;
+            if (score.gameoverTimer > 45) {
+                gameoverTxt = 'G';
+            } else if (score.gameoverTimer > 41) {
+                gameoverTxt = 'GA';
+            } else if (score.gameoverTimer > 37) {
+                gameoverTxt = 'GAM';
+            } else if (score.gameoverTimer > 33) {
+                gameoverTxt = 'GAME';
+            } else if (score.gameoverTimer > 29) {
+                gameoverTxt = 'GAME  O';
+            } else if (score.gameoverTimer > 25) {
+                gameoverTxt = 'GAME  OV';
+            } else if (score.gameoverTimer > 21) {
+                gameoverTxt = 'GAME  OVE';
+            } else {
+                gameoverTxt = 'GAME  OVER';
+            }
+            ctx.fillText(gameoverTxt,
+                         524 * table.pixelSize + table.offsetLeft,
+                         230 * table.pixelSize + table.offsetTop);
+        }
+        // Draw prompts
+        if (!flag.hasBoosted) {
+            ctx.fillText('HOLD SHIFT TO BOOST',
+                         20 * table.pixelSize + table.offsetLeft,
+                         (table.height - 10) * table.pixelSize + table.offsetTop);
+        }
+        ctx.textAlign = 'right';
+        if (!flag.hasFired) {
+            ctx.fillText('PRESS SPACEBAR TO FIRE',
+                         (table.width - 20) * table.pixelSize + table.offsetLeft,
+                         (table.height - 10) * table.pixelSize + table.offsetTop);
+        }
+        // Draw highscore
+        ctx.fillText('HI-SCORE',
+                     (table.width - 20) * table.pixelSize + table.offsetLeft,
+                     30 * table.pixelSize + table.offsetTop);
+        ctx.fillText(score.highscore,
+                     (table.width - 20) * table.pixelSize + table.offsetLeft,
+                     60 * table.pixelSize + table.offsetTop);
+    };
 
     function Paddle(x, y, width, height) {
         this.width        = width;
@@ -157,7 +206,10 @@ window.addEventListener('load', function load() {
     Paddle.prototype.render = function() {
         if (!this.respawnTimer && !(this.hitTimer % 2)) {
             ctx.fillStyle = palatte.paddle;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillRect(this.x * table.pixelSize + table.offsetLeft,
+                         this.y * table.pixelSize + table.offsetTop,
+                         this.width * table.pixelSize,
+                         this.height * table.pixelSize);
         }
     };
 
@@ -167,8 +219,8 @@ window.addEventListener('load', function load() {
         if (this.y < 0) {
             this.y = 0;
             this.y_speed = 0;
-        } else if (this.y + this.height > canvas.height) {
-            this.y = canvas.height - this.height;
+        } else if (this.y + this.height > table.height) {
+            this.y = table.height - this.height;
             this.y_speed = 0;
         }
     };
@@ -180,7 +232,7 @@ window.addEventListener('load', function load() {
     };
 
     function Computer() {
-        this.paddle = new Paddle(1056, 430, 16, 60);
+        this.paddle = new Paddle(1064, 435, 16, 60);
     }
 
     Computer.prototype.render = function() {
@@ -201,8 +253,8 @@ window.addEventListener('load', function load() {
             this.paddle.move(0, diff);
             if (this.paddle.y < 0) {
                 this.paddle.y = 0;
-            } else if (this.paddle.y + this.paddle.height > canvas.height) {
-                this.paddle.y = canvas.height - this.paddle.height;
+            } else if (this.paddle.y + this.paddle.height > table.height) {
+                this.paddle.y = table.height - this.paddle.height;
             }
             if (!this.paddle.respawnTimer) {
                 if (diff == 0 || Math.floor(Math.random() * 50) == 7) {
@@ -226,7 +278,7 @@ window.addEventListener('load', function load() {
     }
 
     function Player() {
-        this.paddle = new Paddle(158, 430, 16, 60);
+        this.paddle = new Paddle(160, 435, 16, 60);
     }
 
     Player.prototype.render = function() {
@@ -284,7 +336,9 @@ window.addEventListener('load', function load() {
 
     Ball.prototype.render = function() {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 8, 2 * Math.PI, false);
+        ctx.arc(this.x * table.pixelSize + table.offsetLeft,
+                this.y * table.pixelSize + table.offsetTop,
+                8 * table.pixelSize, 2 * Math.PI, false);
         ctx.fillStyle = palatte.ball;
         ctx.fill();
     };
@@ -300,15 +354,15 @@ window.addEventListener('load', function load() {
             this.y = 8;
             this.y_speed = -this.y_speed;
             playSound('ballHit');
-        } else if (this.y + 8 > canvas.height) {
-            this.y = canvas.height - 8;
+        } else if (this.y + 8 > table.height) {
+            this.y = table.height - 8;
             this.y_speed = -this.y_speed;
             playSound('ballHit');
         }
-        if (this.x < 0 || this.x > canvas.width) {
+        if (this.x < 0 || this.x > table.width) {
             if (this.x < 0) {
                 gameover();
-            } else if (this.x > canvas.width) {
+            } else if (this.x > table.width) {
                 updateScore(10);
                 playSound('point');
             }
@@ -317,11 +371,11 @@ window.addEventListener('load', function load() {
             if (Math.floor(Math.random() * 2)) {
                 this.y_speed = -this.y_speed;
             }
-            this.x = canvas.width / 2;
+            this.x = table.width / 2;
             this.y = Math.floor(Math.random() * 15) * 30 + 248;
         }
         // collision detection
-        if (left_x < canvas.width / 2) {
+        if (left_x < table.width / 2) {
             if (!player.paddle.respawnTimer &&
                 left_y < (paddle1.y + paddle1.height) && right_y > paddle1.y &&
                 left_x < (paddle1.x + paddle1.width) && right_x > paddle1.x) {
@@ -353,13 +407,16 @@ window.addEventListener('load', function load() {
     }
 
     Bullet.prototype.inBounds = function() {
-        return this.x >= 0 && this.x <= canvas.width &&
-               this.y >= 0 && this.y <= canvas.height;
+        return this.x >= 0 && this.x <= table.width &&
+               this.y >= 0 && this.y <= table.height;
     };
 
-    Bullet.prototype.draw = function() {
+    Bullet.prototype.render = function() {
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillRect(this.x * table.pixelSize + table.offsetLeft,
+                     this.y * table.pixelSize + table.offsetTop,
+                     this.width * table.pixelSize,
+                     this.height * table.pixelSize);
     };
 
     Bullet.prototype.update = function() {
