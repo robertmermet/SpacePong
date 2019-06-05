@@ -49,7 +49,7 @@ window.addEventListener('load', function load() {
 
     var player    = new Player(),
         computer  = new Computer(),
-        ball      = new Ball(canvas.width / 2, 398),
+        ball      = new Ball(table.width / 2, 398),
         keysDown  = {};
 
     var update = function() {
@@ -123,8 +123,8 @@ window.addEventListener('load', function load() {
         // Draw divider
         ctx.fillStyle = palatte.divider;
         for (var i = 0; i < 31; i++) {
-            ctx.fillRect(canvas.width / 2 - 2,
-                         i * 30 * table.pixelSize + table.offsetTop,
+            ctx.fillRect(canvas.width / 2 - 4 * table.pixelSize,
+                         (i * 30 + 7) * table.pixelSize + table.offsetTop,
                          8 * table.pixelSize,
                          16 * table.pixelSize);
         }
@@ -286,7 +286,7 @@ window.addEventListener('load', function load() {
     };
 
     Player.prototype.update = function() {
-        if (!this.paddle.hitTimer) {
+        if (!this.paddle.hitTimer && !this.paddle.respawnTimer) {
             var playerSpeed;
             // Speed boost
             if (keysDown[16]) {              // Control
