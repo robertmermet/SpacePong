@@ -49,7 +49,7 @@ window.addEventListener('load', function load() {
 
     var player    = new Player(),
         computer  = new Computer(),
-        ball      = new Ball(table.width / 2, 398),
+        ball      = new Ball(table.width / 2, 405),
         keysDown  = {};
 
     var update = function() {
@@ -372,7 +372,7 @@ window.addEventListener('load', function load() {
                 this.y_speed = -this.y_speed;
             }
             this.x = table.width / 2;
-            this.y = Math.floor(Math.random() * 15) * 30 + 248;
+            this.y = Math.floor(Math.random() * 15) * 30 + 255;
         }
         // collision detection
         if (left_x < table.width / 2) {
