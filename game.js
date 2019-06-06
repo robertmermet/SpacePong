@@ -169,8 +169,8 @@ window.addEventListener('load', function load() {
                 gameoverTxt = 'GAME  OVER';
             }
             ctx.fillText(gameoverTxt,
-                         524 * table.pixelSize + table.offsetLeft,
-                         230 * table.pixelSize + table.offsetTop);
+                         522 * table.pixelSize + table.offsetLeft,
+                         236 * table.pixelSize + table.offsetTop);
         }
         // Draw prompts
         if (!flag.hasBoosted) {
