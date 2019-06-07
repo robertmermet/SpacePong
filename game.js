@@ -16,7 +16,8 @@ window.addEventListener('load', function load() {
         hit       : 'wav/462189__tolerabledruid6__8-bit-atari-boom.wav',
         explosion : 'wav/425335__soundholder__8bit-explosion-4.wav',
         point     : 'wav/275896__n-audioman__coin02.wav',
-        gameover  : 'wav/443189__resofactor__c2-atari-kick.wav'
+        gameover  : 'wav/443189__resofactor__c2-atari-kick.wav',
+        respawn   : 'wav/404734__owlstorm__retro-video-game-sfx-wobble-up.wav'
     };
 
     var score = {
@@ -262,6 +263,7 @@ window.addEventListener('load', function load() {
                 }
             }
         }
+        if (this.paddle.respawnTimer === 1) playSound('respawn');
         if (this.paddle.hitTimer) this.paddle.hitTimer--;
         if (this.paddle.respawnTimer) this.paddle.respawnTimer--;
     };
@@ -311,19 +313,20 @@ window.addEventListener('load', function load() {
                 }
             }
         }
+        if (this.paddle.respawnTimer === 1) playSound('respawn');
         if (this.paddle.hitTimer) this.paddle.hitTimer--;
         if (this.paddle.respawnTimer) this.paddle.respawnTimer--;
     };
 
     Player.prototype.shoot = function() {
         if (gameObjs.pBullets.length === 0) {
+            playSound('shoot');
             gameObjs.pBullets.push(new Bullet({
                 vel : 18,
                 x   : this.paddle.x,
                 y   : this.paddle.y + this.paddle.height / 2
             }));
             flag.hasFired = true;
-            playSound('shoot');
         }
     }
 
@@ -351,20 +354,20 @@ window.addEventListener('load', function load() {
             right_x = this.x + 8,
             right_y = this.y + 8;
         if (this.y - 8 < 0) {
+            playSound('ballHit');
             this.y = 8;
             this.y_speed = -this.y_speed;
-            playSound('ballHit');
         } else if (this.y + 8 > table.height) {
+            playSound('ballHit');
             this.y = table.height - 8;
             this.y_speed = -this.y_speed;
-            playSound('ballHit');
         }
         if (this.x < 0 || this.x > table.width) {
             if (this.x < 0) {
                 gameover();
             } else if (this.x > table.width) {
-                updateScore(10);
                 playSound('point');
+                updateScore(10);
             }
             this.x_speed = -5;
             this.y_speed = Math.floor(Math.random() * 5);
@@ -379,19 +382,19 @@ window.addEventListener('load', function load() {
             if (!player.paddle.respawnTimer &&
                 left_y < (paddle1.y + paddle1.height) && right_y > paddle1.y &&
                 left_x < (paddle1.x + paddle1.width) && right_x > paddle1.x) {
+                playSound('ballHit');
                 this.x_speed = 5;
                 this.y_speed += (paddle1.y_speed / 2);
                 this.x += this.x_speed;
-                playSound('ballHit');
             }
         } else {
             if (!computer.paddle.respawnTimer &&
                 left_y < (paddle2.y + paddle2.height) && right_y > paddle2.y &&
                 left_x < (paddle2.x + paddle2.width) && right_x > paddle2.x) {
+                playSound('ballHit');
                 this.x_speed = -5;
                 this.y_speed += (paddle2.y_speed / 2);
                 this.x += this.x_speed;
-                playSound('ballHit');
             }
         }
     };
@@ -428,16 +431,16 @@ window.addEventListener('load', function load() {
             this.y + (this.height / 2) >= computer.paddle.y &&
             this.y + (this.height / 2) <= computer.paddle.y + computer.paddle.height) {
             if (computer.paddle.height > 30) {
+                playSound('hit');
                 computer.paddle.hitTimer = 30;
                 computer.paddle.height -= 20;
                 computer.paddle.y += 10;
                 updateScore(1);
-                playSound('hit');
             } else {
+                playSound('explosion');
                 computer.paddle.respawn(300);
                 score.killCount++;
                 updateScore(5 * score.killCount);
-                playSound('explosion');
             }
             player.paddle.height += 20;
             player.paddle.y -= 10;
@@ -448,17 +451,17 @@ window.addEventListener('load', function load() {
             this.y + (this.height / 2) >= player.paddle.y &&
             this.y + (this.height / 2) <= player.paddle.y + player.paddle.height) {
             if (player.paddle.height > 30) {
+                playSound('hit');
                 player.paddle.hitTimer = 30;
                 player.paddle.height -= 20;
                 player.paddle.y += 10;
                 computer.paddle.height += 20;
                 computer.paddle.y -= 10;
                 updateScore(-1);
-                playSound('hit');
             } else {
+                playSound('explosion');
                 player.paddle.respawn(100);
                 gameover();
-                playSound('explosion');
             }
             this.active = false;
         }
